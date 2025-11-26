@@ -103,7 +103,7 @@ while True:
         ax[1].tick_params(axis='y', colors=colorb)
         
 
-        plot_file_path = os.path.join(temp_dir, 'plot.png')
+        plot_file_path = "./plot_temp.png"
         fig.savefig(plot_file_path, format='png')
         plot_surface = pygame.image.load(plot_file_path)
     cont -= 1
