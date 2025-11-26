@@ -5,11 +5,13 @@
 Este codigo es una simulación de como las celulas del corazón se autoorganizan. Esta inspirado en el libro _"Sync,how order emerges from chaos in the universe, nature, and daily life"_ de Steven Strogatz
 
 ## Dependencias y como ejecutar
+### Librerías necesarias:
 - **Numpy**: Para cálculos numéricos
 - **Random**: Para randomizar las condiciones iniciales
 - **Matplotlib**: Para graficar resultados
 - **Pygame**: Para animar la representación de la simulación
 
+### Ejecución del código
 Primero es necesario ejecutar el archivo **Sync_Sim.py**.
 Este archivo simula el proceso y genera 2 archivos: 
 - **output.npy**: de unos 200MB, contiene la informacion de cada célula en cada iteracion del proceso
