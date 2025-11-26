@@ -2,7 +2,7 @@
 
 
 ## Introducción
-Este codigo es una simulación de como las celulas del corazón se autoorganizan. Esta inspirado en el libro _"Sync,how order emerges from chaos in the universe, nature, and daily life"_ de Steven Strogatz
+Este codigo es una simulación de como las celulas del corazón se autoorganizan. Esta inspirado en el libro _"Sync,how order emerges from chaos in the universe, nature, and daily life"_ de Steven Strogatz.
 
 ## Dependencias y como ejecutar
 ### Librerías necesarias:
@@ -21,3 +21,6 @@ Una vez ejecutado y esos 2 archivos han sido creados se puede ejecutar **Sync_Si
 Durante el proceso genera y sobreescribe **plot_temp.png**.
 
 ## Explicación Simulación
+Un conjunto de células reciben constantemente carga eléctrica, cuanta mas carga eléctrica tienen menos reciben. Al llegar a cierto valor de carga eléctrica las células se descargan de golpe, perdiendo toda la carga y dándosela al resto de células (todas o las próximas solo).
+Para el caso en el que la descarga se realiza a las vecinas próximas es importante considerar como tratar las condiciones de contorno. Estas pueden ser periodicas (El borde de arriba es vecino del borde de abajo, lo mismo para los lados), fijas (Las células de los bordes tienen siempre carga 0) o una mezcla de ambas (Por ejemplo que los bordes superior e inferior tengan condiciones de contorno fijas y el resto periódicas)
+Despues de ciertas iteraciones se puede observar como la entropía de Shannon del sistema disminuye y como la carga media pasa de un comportamiento caótico a un comportamiento ordenado con varias frecuencias, y pasado el tiempo se unifica en una única frecuencia, donde todas las células se comportan de manera sincronizada, como una única célula.
