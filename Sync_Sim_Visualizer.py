@@ -2,9 +2,11 @@ import pygame, sys, os
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import configuracion
 
 
-
+tipo_descarga = configuracion.tipo_descarga
+condiciones_contorno = configuracion.condiciones_contorno
 
 FPS = 180
 ancho_ventana, alto_ventana = 1280, 720
@@ -116,6 +118,7 @@ while True:
     
     screen.fill((25, 25, 25))
     text = font.render(str(it)+''+'/'+''+str(len(data)), True, (255, 255, 255))
+    text_info = font.render(str(tipo_descarga)+' '+'Condiciones '+str(condiciones_contorno), True, (255, 255, 255))
     #all_sprites.draw(screen)
     for i in range(np.shape(data)[1]):
             for j in range(np.shape(data)[2]):
@@ -123,6 +126,7 @@ while True:
                 #celu = cells[i*np.shape(data)[1]+j]
                 #celu.update(data[it,i,j])
     screen.blit(text, (20, 20))
+    screen.blit(text_info, (200, 20))
     screen.blit(plot_surface, (650, 20))
     pygame.display.update()
     mainClock.tick(FPS)

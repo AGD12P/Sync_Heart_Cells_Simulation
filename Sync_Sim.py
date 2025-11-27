@@ -1,35 +1,37 @@
 import numpy as np
 import random
 import csv
+import configuracion
+
+tipo_descarga = configuracion.tipo_descarga
+condiciones_contorno = configuracion.condiciones_contorno
+
+#tipo_descarga es global por defecto
+if tipo_descarga != 'local' and tipo_descarga != 'global':
+    tipo_descarga = 'global'
+#condiciones_contorno son periodicas por defecto
+if condiciones_contorno != 'periodicas' and condiciones_contorno != 'fijas' and condiciones_contorno != 'mixtas':
+    condiciones_contorno = 'periodicas'
+
 
 
 
 def carga_natural(matriz,n):
-    matriz += 2 - (1.85 * (matriz / 255)**2) #25/11/2025
-    #matriz += 2 - (1.99 * (matriz / 255)**2)
-
-    return matriz
-"""
-def descarga_natural(matriz,i,j):
-    matriz += 50
-    matriz[i,j]=0
+    matriz += 2 - (1.85 * (matriz / 255)**2) 
     return matriz
 """
 def descarga_natural(matriz,i,j): #25/11/2025 (No cambia nada creo)
     matriz += 50
     matriz[i,j]-= 255
     return matriz
-
+"""
 def carga_artificial(matriz,n):
-    #matriz += n/2 * (2 - (1.85 * (matriz / 255)**2))
     matriz += n/2 * (2 - (1.85 * (matriz / 255)**2))
     return matriz
 
-def carga_artificial_local(matriz,i,j,n):
+def carga_artificial_local(matriz,i,j,n,contorno):
     def factor(matriz,i,j,n):
         return n/2 * (2 - (1.85 * (matriz[i,j] / 255)**2))
-    
-    #matriz += n/2 * (2 - (1.85 * (matriz / 255)**2))
     #Cond contorno periodicas
     i_sig = i+1
     i_ant = i-1
@@ -54,11 +56,17 @@ def carga_artificial_local(matriz,i,j,n):
                 matriz[ii,jj] += factor(matriz,ii,jj,n)
                 ###matriz[ii,jj] += factor(matriz,i,j,n)
                 
-
-    matriz[0,:]=0
-    #matriz[:,0]=0
-    matriz[np.shape(matriz)[0]-1,:]=0
-    #matriz[:,np.shape(matriz)[1]-1]=0
+    if contorno == 'periodicas':
+        pass
+    elif contorno == 'fijas':
+        matriz[0,:]=0
+        matriz[:,0]=0
+        matriz[np.shape(matriz)[0]-1,:]=0
+        matriz[:,np.shape(matriz)[1]-1]=0
+    elif contorno == 'mixtas':
+        matriz[:,0]=0
+        matriz[:,np.shape(matriz)[1]-1]=0
+    
     return matriz   
 
 def entropia_de_shannon(matriz):
@@ -69,7 +77,12 @@ def entropia_de_shannon(matriz):
         if px != 0:
             H -= px*np.log2(px)
     return H
-
+def metricas(it, matriz,X,Y,iter_list,iter_metrics):
+    iter_list[it] = matriz.copy()
+    iter_metrics[it,0]=it
+    iter_metrics[it,1]=np.sum(matriz)/(X*Y)
+    iter_metrics[it,2]=entropia_de_shannon(matriz)
+    return iter_list,iter_metrics
 
 
 X=50
@@ -86,15 +99,80 @@ for i in range(Y):
 iter_list = np.zeros((iteraciones, Y, X))
 iter_metrics = np.zeros((iteraciones,3)) #
 
+
+
+if tipo_descarga == 'global':
+    if condiciones_contorno == 'periodicas':
+        for it in range(iteraciones):
+            iter_list, iter_metrics = metricas(it,matriz,X,Y,iter_list,iter_metrics)
+            matriz = carga_natural(matriz,1)
+            if it % 100 == 0:
+                print('Iteraciones:',it, '/',iteraciones)
+            while np.any(matriz >= 255):
+                matriz = carga_artificial(matriz,52)
+                matriz[matriz >= 255] = 0
+
+    elif condiciones_contorno == 'fijas':
+        for it in range(iteraciones):
+            iter_list, iter_metrics = metricas(it,matriz,X,Y,iter_list,iter_metrics)
+            matriz = carga_natural(matriz,1)
+            if it % 100 == 0:
+                print('Iteraciones:',it, '/',iteraciones)
+            while np.any(matriz >= 255):
+                matriz = carga_artificial(matriz,52)
+                matriz[matriz >= 255] = 0
+                matriz[0,:] = 0
+                matriz[:,0] = 0
+                matriz[np.shape(matriz)[0]-1,:] = 0
+                matriz[:,np.shape(matriz)[1]-1] = 0
+
+    elif condiciones_contorno == 'mixtas':
+        for it in range(iteraciones):
+            iter_list, iter_metrics = metricas(it,matriz,X,Y,iter_list,iter_metrics)
+            matriz = carga_natural(matriz,1)
+            if it % 100 == 0:
+                print('Iteraciones:',it, '/',iteraciones)
+            while np.any(matriz >= 255):
+                matriz = carga_artificial(matriz,52)
+                matriz[matriz >= 255] = 0
+                matriz[:,0] = 0
+                matriz[:,np.shape(matriz)[1]-1] = 0
+
+
+
+
+if tipo_descarga == 'local':
+    for it in range(iteraciones):
+        iter_list, iter_metrics = metricas(it,matriz,X,Y,iter_list,iter_metrics)
+        matriz = carga_natural(matriz,1)
+        if it % 100 == 0:
+            print('Iteraciones:',it, '/',iteraciones)
+        while np.any(matriz >= 255):
+            ij = np.where(matriz >= 255)
+            ij = np.argmax(matriz >= 255)
+            ij = np.unravel_index(ij, matriz.shape)
+            matriz = carga_artificial_local(matriz,ij[0],ij[1],50,condiciones_contorno)
+            matriz[ij[0],ij[1]] = 0
+
+    
+
+    
+
+
+'''
+
+
+
 for it in range(iteraciones):
-    iter_list[it] = matriz.copy()
-    iter_metrics[it,0]=it
-    iter_metrics[it,1]=np.sum(matriz)/(X*Y)
-    iter_metrics[it,2]=entropia_de_shannon(matriz)
+    #iter_list[it] = matriz.copy()
+    #iter_metrics[it,0]=it
+    #iter_metrics[it,1]=np.sum(matriz)/(X*Y)
+    #iter_metrics[it,2]=entropia_de_shannon(matriz)
+    iter_list, iter_metrics = metricas(it,matriz,X,Y,iter_list,iter_metrics)
     matriz = carga_natural(matriz,1)
     c=0
     if it % 100 == 0:
-            print('Iteraciones:',it)
+            print('Iteraciones:',it, '/',iteraciones)
     while np.any(matriz >= 255):
         c+=1
         ##print('While:',c)
@@ -123,11 +201,8 @@ for it in range(iteraciones):
         matriz = carga_artificial(matriz,52)
         matriz[matriz >= 255] = 0
         #matriz[ij[0],ij[1]] = 0
-    
+'''    
 
 np.save(f'output.npy',iter_list)
 np.save(f'output_metrics.npy',iter_metrics)
-'''
-with open('output.csv','w',newline='') as file:
-    writer = csv.writer(file)
-    writer.writerows(iter_list)'''
+
