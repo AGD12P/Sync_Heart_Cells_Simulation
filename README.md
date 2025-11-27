@@ -27,4 +27,6 @@ Para el caso en el que la descarga se realiza a las vecinas próximas es importa
 Despues de ciertas iteraciones se puede observar como la entropía de Shannon del sistema disminuye y como la carga media pasa de un comportamiento caótico a un comportamiento ordenado con varias frecuencias, y pasado el tiempo se unifica en una única frecuencia, donde todas las células se comportan de manera sincronizada, como una única célula.
 
 
+A
+
 
