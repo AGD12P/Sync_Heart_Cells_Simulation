@@ -3,3 +3,5 @@ Sync_Sim_old.py
 output.npy
 output_metrics.npy
 plot_temp.png
+__pycache__/
+.gitattributes
